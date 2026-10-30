@@ -183,21 +183,21 @@ export function getDefaultColors(): Colors {
 export function isSupported() {
   const p = typeof process !== 'undefined' ? process : undefined
 
-  // Outside Node there is no env or argv to inspect, so the checks below would
+  // In a browser there is no env or argv to inspect, so the checks below would
   // always pass. Only chromium browsers render ANSI colors in the console.
-  if (!p) {
+  if (!p && typeof window !== 'undefined') {
     // @ts-expect-error chrome is not a standard feature
-    return typeof window !== 'undefined' && !!window.chrome
+    return !!window.chrome
   }
 
-  const env = p.env || {}
+  const env = p?.env || {}
   const isTTY = env.FORCE_TTY !== 'false' // assume TTY
-  const argv = p.argv || []
+  const argv = p?.argv || []
   const nodeEnabled =
     !('NO_COLOR' in env || argv.includes('--no-color')) &&
     ('FORCE_COLOR' in env ||
       argv.includes('--color') ||
-      p.platform === 'win32' ||
+      p?.platform === 'win32' ||
       (isTTY && env.TERM !== 'dumb') ||
       'CI' in env)
   return nodeEnabled
